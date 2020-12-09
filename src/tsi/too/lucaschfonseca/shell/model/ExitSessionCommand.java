@@ -6,8 +6,9 @@ import java.io.IOException;
 
 public class ExitSessionCommand extends NonSystemShellCommand {
 
-    public ExitSessionCommand() {
+    public ExitSessionCommand(Shell shell) {
         super("exit");
+        setArg(shell);
     }
 
     @Override

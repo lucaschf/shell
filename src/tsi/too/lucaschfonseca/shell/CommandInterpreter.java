@@ -19,13 +19,12 @@ public class CommandInterpreter {
     }
 
     public String interpretAndExecute(String userInput) {
-        if (userInput.isBlank())
+        if (userInput.isBlank()) // nothing to do
             return "";
 
         try {
             return recoverCommandFromUserInput(userInput).execute();
         } catch (IOException e) {
-            e.printStackTrace();
             return "failed to execute";
         } catch (NoSuchCommandException e) {
             return e.getMessage();
@@ -34,13 +33,13 @@ public class CommandInterpreter {
 
     private Command recoverCommandFromUserInput(String userInput) throws IllegalArgumentException, NoSuchCommandException {
         String commandName;
-        Object[] args = new Object[]{};
+        String args = "";
 
         if (userInput == null || !userInput.contains(" ")) {
             commandName = userInput;
         } else {
             commandName = userInput.substring(0, userInput.indexOf(" ")).trim();
-            args = new String[]{userInput.substring(commandName.length()).trim()};
+            args = userInput.substring(commandName.length()).trim();
         }
 
         if (nonSystemShellCommands.getCommands().contains(commandName))
@@ -56,7 +55,7 @@ public class CommandInterpreter {
 
         public Command create(String name, Object arg) throws IllegalArgumentException, NoSuchCommandException {
             if (name.equalsIgnoreCase(CommandNames.EXIT)) {
-                return new ExitSessionCommand().setArg(context);
+                return new ExitSessionCommand(context);
             }
 
             if (name.equalsIgnoreCase(CommandNames.SHELL))

@@ -54,6 +54,7 @@ public class Shell extends JFrame {
 
     private void setUpOutputTextArea() {
         outputTextArea = new JTextArea();
+        outputTextArea.setFont(new Font("Consolas", Font.PLAIN, 13));
         outputTextArea.setLineWrap(true);
         outputTextArea.setEditable(false);
         outputTextArea.setFocusable(false);
@@ -65,6 +66,7 @@ public class Shell extends JFrame {
 
     private void setUpInputTextArea() {
         inputTextArea = new JTextArea();
+        inputTextArea.setFont(new Font("Consolas", Font.PLAIN, 13));
         inputTextArea.setLineWrap(true);
         inputTextArea.setBackground(Color.BLACK);
         inputTextArea.setForeground(Color.WHITE);
@@ -151,20 +153,26 @@ public class Shell extends JFrame {
         inputTextArea.setText(split[0] + ">");
 
         try {
-            appendCommandOnHistory(interpreter.interpretAndExecute(split[1].replaceAll("\n", "")));
+            var s = interpreter.interpretAndExecute(split[1].replaceAll("\n", ""));
+            System.out.println(s);
+            appendCommandOnHistory(s);
         } catch (IllegalArgumentException e) {
             appendCommandOnHistory(e.getMessage());
         }
     }
 
     private void appendCommandOnHistory(String message) {
-        if(message.isEmpty())
+        if (message.isEmpty())
             return;
 
-        if (outputTextArea.getText().isEmpty())
-            outputTextArea.append(message.replace("\n", ""));
-        else
-            outputTextArea.append("\n" + message.replace("\n", ""));
+        final String lineSeparator = "\n";
+
+        if (message.startsWith(lineSeparator))
+            message = message.substring(1);
+        if (message.endsWith(lineSeparator))
+            message = message.substring(0, message.length() - lineSeparator.length() + 1);
+
+        outputTextArea.append("\n" + message.trim());
     }
 
     public static void open(String directory) {
