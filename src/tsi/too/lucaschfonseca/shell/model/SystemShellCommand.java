@@ -1,6 +1,9 @@
 package tsi.too.lucaschfonseca.shell.model;
 
+import tsi.too.lucaschfonseca.shell.api.Session;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -8,13 +11,8 @@ import java.text.MessageFormat;
 import java.util.stream.Collectors;
 
 public abstract class SystemShellCommand extends Command {
-    public SystemShellCommand(String name, String args) {
-        super(name);
-        setArg(args);
-    }
-
-    public SystemShellCommand(String name) {
-        super(name);
+    public SystemShellCommand(String name, Session executionContext) {
+        super(name, executionContext);
     }
 
     @Override
@@ -24,6 +22,9 @@ public abstract class SystemShellCommand extends Command {
                 "/c",
                 MessageFormat.format("{0} {1}", getName(), getArg())
         );
+
+        var directory = new File(getExecutionContext().getCurrentDirectory());
+        p.directory(directory);
 
         return retrieveResults(p.start());
     }

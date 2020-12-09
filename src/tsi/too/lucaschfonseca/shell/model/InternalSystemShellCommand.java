@@ -1,11 +1,10 @@
 package tsi.too.lucaschfonseca.shell.model;
 
-public class InternalSystemShellCommand extends SystemShellCommand {
-    public InternalSystemShellCommand(String name, String arg) {
-        super(name, arg);
-    }
+import tsi.too.lucaschfonseca.shell.api.Session;
 
-    public InternalSystemShellCommand(String name) {
-        super(name);
+public class InternalSystemShellCommand extends SystemShellCommand {
+
+    public InternalSystemShellCommand(String name, Session executionContext) {
+        super(name, executionContext);
     }
 }

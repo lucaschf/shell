@@ -1,13 +1,10 @@
 package tsi.too.lucaschfonseca.shell.model;
 
+import tsi.too.lucaschfonseca.shell.api.Session;
+
 public abstract class NonSystemShellCommand extends Command {
 
-    private NonSystemShellCommand(String name, Object arg) {
-        super(name);
-        setArg(arg);
-    }
-
-    public NonSystemShellCommand(String name) {
-        super(name);
+    public NonSystemShellCommand(String name, Session executionContext) {
+        super(name, executionContext);
     }
 }

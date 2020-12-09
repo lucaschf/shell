@@ -16,9 +16,9 @@ public abstract class Session {
     private String path;
     private String identifier;
 
-    private ArrayList<Command> commands = new ArrayList<>();
+    private final ArrayList<Command> commands = new ArrayList<>();
 
-    private LocalDateTime creationTime;
+    private final LocalDateTime creationTime;
     private Map<StringBuilder, StringBuilder> environmentVariables;
 
     /*
@@ -80,11 +80,11 @@ public abstract class Session {
         environmentVariables.put(new StringBuilder(name), new StringBuilder(value));
     }
 
-    public void addCommandLog(Command command){
+    public void addCommandLog(Command command) {
         commands.add(command);
     }
 
-    public List<Command> getCommands(){
+    public List<Command> getCommands() {
         return Collections.unmodifiableList(commands);
     }
 
@@ -92,8 +92,8 @@ public abstract class Session {
         return creationTime;
     }
 
-    public long getUptime() {
-        return creationTime.until(LocalDateTime.now(), ChronoUnit.MINUTES);
+    public long getUptimeInSeconds() {
+        return creationTime.until(LocalDateTime.now(), ChronoUnit.SECONDS);
     }
 
 //	Isso nao faz sentido pra mim. Uma vez que uma superclasse ou interface nao deve conhecer suas

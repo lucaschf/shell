@@ -3,7 +3,6 @@ package tsi.too.lucaschfonseca.shell.ui;
 import tsi.too.lucaschfonseca.shell.CommandInterpreter;
 import tsi.too.lucaschfonseca.shell.api.Session;
 import tsi.too.lucaschfonseca.shell.api.SessionController;
-import tsi.too.lucaschfonseca.shell.impl.ShellSession;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -16,7 +15,7 @@ import java.awt.event.WindowEvent;
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
-    private Session session;
+    private final Session session;
 
     private JTextArea outputTextArea;
     private JTextArea inputTextArea;
@@ -24,25 +23,28 @@ public class MainWindow extends JFrame {
     private final CommandInterpreter interpreter;
 
     public MainWindow(String c) {
-        interpreter = new CommandInterpreter(this);
         session = SessionController.getInstance().createSession(c);
 
+        session.setCurrentDirectory(getDefaultDirectory());
+
+        interpreter = new CommandInterpreter(this, session);
+
         initComponent();
-        setUpWindow();
-        if (c == null || c.isBlank()) {
-            var s = getDefaultDirectory() + ">";
-            inputTextArea.append(s);
-            inputTextArea.setCaretPosition(s.length());
-        } else
-
-
-            setTitle(session.getIdentifier());
-
+        setUpWindow(c);
 
         inputTextArea.requestFocus();
     }
 
-    private void setUpWindow() {
+    private void setUpWindow(String c) {
+        var s = getDefaultDirectory() + ">";
+
+        if (c == null || c.isBlank()) {
+            inputTextArea.append(s);
+            inputTextArea.setCaretPosition(s.length());
+        }
+
+        setTitle(session.getIdentifier());
+
         setMinimumSize(new Dimension(800, 420));
         pack();
         setLocationRelativeTo(null);
@@ -156,13 +158,14 @@ public class MainWindow extends JFrame {
         appendCommandOnHistory(enteredCommand);
 
         var split = enteredCommand.split(">");
-        inputTextArea.setText(split[0] + ">");
 
         try {
             var parameterizedCommand = split[1].stripLeading().replaceAll("\n", "");
             appendCommandOnHistory(interpreter.interpretAndExecute(parameterizedCommand));
         } catch (IllegalArgumentException e) {
             appendCommandOnHistory(e.getMessage());
+        } finally {
+            inputTextArea.setText(session.getCurrentDirectory() + ">");
         }
     }
 
