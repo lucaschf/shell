@@ -2,6 +2,8 @@ package tsi.too.lucaschfonseca.shell.ui;
 
 import tsi.too.lucaschfonseca.shell.CommandInterpreter;
 import tsi.too.lucaschfonseca.shell.api.Session;
+import tsi.too.lucaschfonseca.shell.api.SessionController;
+import tsi.too.lucaschfonseca.shell.impl.ShellSession;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -12,9 +14,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 @SuppressWarnings("serial")
-public class Shell extends JFrame {
+public class MainWindow extends JFrame {
 
-    private static int shellNumber = 0;
     private Session session;
 
     private JTextArea outputTextArea;
@@ -22,18 +23,21 @@ public class Shell extends JFrame {
 
     private final CommandInterpreter interpreter;
 
-    public Shell(String c) {
+    public MainWindow(String c) {
         interpreter = new CommandInterpreter(this);
+        session = SessionController.getInstance().createSession(c);
 
         initComponent();
         setUpWindow();
         if (c == null || c.isBlank()) {
-            setTitle("Shell " + ++shellNumber);
             var s = getDefaultDirectory() + ">";
             inputTextArea.append(s);
             inputTextArea.setCaretPosition(s.length());
         } else
-            setTitle(c);
+
+
+            setTitle(session.getIdentifier());
+
 
         inputTextArea.requestFocus();
     }
@@ -45,7 +49,7 @@ public class Shell extends JFrame {
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                shellNumber--;
+                SessionController.getInstance().closeSession(session);
             }
         });
     }
@@ -177,7 +181,7 @@ public class Shell extends JFrame {
     }
 
     public static void open(String directory) {
-        new Shell(directory).setVisible(true);
+        new MainWindow(directory).setVisible(true);
     }
 
     public void close() {

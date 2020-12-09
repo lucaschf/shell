@@ -1,19 +1,25 @@
 package tsi.too.lucaschfonseca.shell.api;
 
+import tsi.too.lucaschfonseca.shell.model.Command;
+
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class Session {
-
     private String currentDirectory;
     private String path;
     private String identifier;
 
-    private LocalDateTime creationTime;
-    private LocalDateTime closeTime;
+    private ArrayList<Command> commands = new ArrayList<>();
 
-    private final Map<StringBuilder, StringBuilder> environmentVariables;
+    private LocalDateTime creationTime;
+    private Map<StringBuilder, StringBuilder> environmentVariables;
 
     /*
      * Gets all the operating system environment variables and the value of the PATH
@@ -21,8 +27,17 @@ public abstract class Session {
      * environmentVariables. * /
      */
     public Session() {
+        identifier = "";
         creationTime = LocalDateTime.now();
+        populateEnvironmentVariables();
+    }
 
+    public Session(String identifier) {
+        this();
+        this.identifier = identifier;
+    }
+
+    private void populateEnvironmentVariables() {
         var env = System.getenv();
         setPath(env.get("PATH"));
 
@@ -46,6 +61,10 @@ public abstract class Session {
         this.path = path;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     public Map<StringBuilder, StringBuilder> getEnvironmentVariables() {
         return environmentVariables;
     }
@@ -61,11 +80,23 @@ public abstract class Session {
         environmentVariables.put(new StringBuilder(name), new StringBuilder(value));
     }
 
-    public void closeSession(){
+    public void addCommandLog(Command command){
+        commands.add(command);
+    }
 
+    public List<Command> getCommands(){
+        return Collections.unmodifiableList(commands);
+    }
+
+    public LocalDateTime getCreationTime() {
+        return creationTime;
+    }
+
+    public long getUptime() {
+        return creationTime.until(LocalDateTime.now(), ChronoUnit.MINUTES);
     }
 
 //	Isso nao faz sentido pra mim. Uma vez que uma superclasse ou interface nao deve conhecer suas
-//	subclasses/implementações.
+//	subclasses/implementações. E nao e possivel fazer a instanciacao direta de uma classe abstrata.
 //	public static Session create();
 }

@@ -31,7 +31,7 @@ public abstract class Command implements ICommand {
 
     @Override
     public String toString() {
-        return "Command [name=" + name + ", arg=" + arg + "]";
+        return "%s %s".formatted(name, arg);
     }
 
     @Override

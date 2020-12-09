@@ -5,16 +5,16 @@ import tsi.too.lucaschfonseca.shell.api.CommandsTable;
 import tsi.too.lucaschfonseca.shell.api.NoSuchCommandException;
 import tsi.too.lucaschfonseca.shell.impl.NonSystemShellCommandsTable;
 import tsi.too.lucaschfonseca.shell.model.*;
-import tsi.too.lucaschfonseca.shell.ui.Shell;
+import tsi.too.lucaschfonseca.shell.ui.MainWindow;
 
 import java.io.IOException;
 
 public class CommandInterpreter {
 
-    private final Shell context;
+    private final MainWindow context;
     private static final CommandsTable nonSystemShellCommands = new NonSystemShellCommandsTable();
 
-    public CommandInterpreter(Shell context) {
+    public CommandInterpreter(MainWindow context) {
         this.context = context;
     }
 
