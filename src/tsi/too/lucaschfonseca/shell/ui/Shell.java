@@ -1,6 +1,7 @@
 package tsi.too.lucaschfonseca.shell.ui;
 
 import tsi.too.lucaschfonseca.shell.CommandInterpreter;
+import tsi.too.lucaschfonseca.shell.api.Session;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -14,6 +15,7 @@ import java.awt.event.WindowEvent;
 public class Shell extends JFrame {
 
     private static int shellNumber = 0;
+    private Session session;
 
     private JTextArea outputTextArea;
     private JTextArea inputTextArea;
@@ -153,9 +155,8 @@ public class Shell extends JFrame {
         inputTextArea.setText(split[0] + ">");
 
         try {
-            var s = interpreter.interpretAndExecute(split[1].replaceAll("\n", ""));
-            System.out.println(s);
-            appendCommandOnHistory(s);
+            var parameterizedCommand = split[1].stripLeading().replaceAll("\n", "");
+            appendCommandOnHistory(interpreter.interpretAndExecute(parameterizedCommand));
         } catch (IllegalArgumentException e) {
             appendCommandOnHistory(e.getMessage());
         }

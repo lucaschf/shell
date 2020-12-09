@@ -11,6 +11,11 @@ public class NonSystemShellCommandsTable implements CommandsTable {
 
     @Override
     public Set<String> getCommands() {
-        return new HashSet<>(Arrays.asList(CommandNames.EXIT, CommandNames.SHELL));
+        return new HashSet<>(
+                Arrays.asList(
+                        CommandNames.EXIT,
+                        CommandNames.SHELL
+                )
+        );
     }
 }

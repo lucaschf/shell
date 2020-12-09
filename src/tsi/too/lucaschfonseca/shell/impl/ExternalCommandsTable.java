@@ -11,6 +11,12 @@ public class ExternalCommandsTable implements CommandsTable {
 
     @Override
     public Set<String> getCommands() {
-        return new HashSet<>(Arrays.asList(CommandNames.TREE, CommandNames.ATTRIB, CommandNames.HELP));
+        return new HashSet<>(
+                Arrays.asList(
+                        CommandNames.TREE,
+                        CommandNames.ATTRIB,
+                        CommandNames.HELP
+                )
+        );
     }
 }

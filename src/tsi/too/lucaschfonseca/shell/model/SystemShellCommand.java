@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.stream.Collectors;
 
 public abstract class SystemShellCommand extends Command {
@@ -18,7 +19,11 @@ public abstract class SystemShellCommand extends Command {
 
     @Override
     public String execute() throws IOException {
-        var p = new ProcessBuilder("cmd", "/c", getName() + getArg());
+        var p = new ProcessBuilder(
+                "cmd",
+                "/c",
+                MessageFormat.format("{0} {1}", getName(), getArg())
+        );
 
         return retrieveResults(p.start());
     }
@@ -28,7 +33,12 @@ public abstract class SystemShellCommand extends Command {
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
-            return "failed to execute";
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
+                return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            } catch (IOException ex) {
+                return "failed to execute command";
+            }
         }
     }
 }

@@ -39,8 +39,10 @@ public class CommandInterpreter {
             commandName = userInput;
         } else {
             commandName = userInput.substring(0, userInput.indexOf(" ")).trim();
-            args = userInput.substring(commandName.length()).trim();
+            args = userInput.substring(commandName.length()).stripLeading().stripTrailing();
         }
+
+        System.out.println("ARGS " + args);
 
         if (nonSystemShellCommands.getCommands().contains(commandName))
             return new NonSystemShellCommandFactory().create(commandName, args);

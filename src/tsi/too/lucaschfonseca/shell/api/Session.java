@@ -1,15 +1,17 @@
 package tsi.too.lucaschfonseca.shell.api;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class Session {
 
     private String currentDirectory;
-
     private String path;
-
     private String identifier;
+
+    private LocalDateTime creationTime;
+    private LocalDateTime closeTime;
 
     private final Map<StringBuilder, StringBuilder> environmentVariables;
 
@@ -19,6 +21,8 @@ public abstract class Session {
      * environmentVariables. * /
      */
     public Session() {
+        creationTime = LocalDateTime.now();
+
         var env = System.getenv();
         setPath(env.get("PATH"));
 
@@ -57,6 +61,11 @@ public abstract class Session {
         environmentVariables.put(new StringBuilder(name), new StringBuilder(value));
     }
 
-//	this doesn't make any sense to me
+    public void closeSession(){
+
+    }
+
+//	Isso nao faz sentido pra mim. Uma vez que uma superclasse ou interface nao deve conhecer suas
+//	subclasses/implementações.
 //	public static Session create();
 }
