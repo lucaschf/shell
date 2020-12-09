@@ -4,5 +4,6 @@ import java.util.Set;
 
 @FunctionalInterface
 public interface CommandsTable {
-    Set<String> getCommandsList();
+
+    Set<String> getCommands();
 }

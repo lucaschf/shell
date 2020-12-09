@@ -1,59 +1,68 @@
 package tsi.too.lucaschfonseca.shell;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.stream.Collectors;
+import tsi.too.lucaschfonseca.shell.api.CommandNames;
+import tsi.too.lucaschfonseca.shell.api.CommandsTable;
+import tsi.too.lucaschfonseca.shell.api.NoSuchCommandException;
+import tsi.too.lucaschfonseca.shell.impl.NonSystemShellCommandsTable;
+import tsi.too.lucaschfonseca.shell.model.*;
+import tsi.too.lucaschfonseca.shell.ui.Shell;
 
-import tsi.too.lucaschfonseca.shell.impl.ExternalCommand;
-import tsi.too.lucaschfonseca.shell.model.Command;
+import java.io.IOException;
 
 public class CommandInterpreter {
-//    private final HashSet<String> runsOutsideSystemShell = new HashSet<>();
 
-    private static CommandInterpreter instance;
+    private final Shell context;
+    private static final CommandsTable nonSystemShellCommands = new NonSystemShellCommandsTable();
 
-    public static CommandInterpreter getInstance() {
-        synchronized (CommandInterpreter.class){
-            if(instance == null)
-                instance = new CommandInterpreter();
+    public CommandInterpreter(Shell context) {
+        this.context = context;
+    }
 
-            return  instance;
+    public String interpretAndExecute(String userInput) {
+        if (userInput.isBlank())
+            return "";
+
+        try {
+            return recoverCommandFromUserInput(userInput).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "failed to execute";
+        } catch (NoSuchCommandException e) {
+            return e.getMessage();
         }
     }
 
-//    private CommandInterpreter() {
-//        runsOutsideSystemShell.add(Command.EXIT.getName());
-//        runsOutsideSystemShell.add(Command.NEW_WINDOW.getName());
-//        runsOutsideSystemShell.add(Command.CLEAR.getName());
-//    }
+    private Command recoverCommandFromUserInput(String userInput) throws IllegalArgumentException, NoSuchCommandException {
+        String commandName;
+        Object[] args = new Object[]{};
 
-    public String interpret(Command command) {
-//        if (!runsOutsideSystemShell(command)) {
-//            try {
-//                return retrieveResults(new ExternalCommand().execute(command.getName() + " " + Arrays.toString(command.getArgs())));
-//            } catch (IOException e) {
-//                return e.getMessage();
-//            }
-//        }
-//
-        return "";
+        if (userInput == null || !userInput.contains(" ")) {
+            commandName = userInput;
+        } else {
+            commandName = userInput.substring(0, userInput.indexOf(" ")).trim();
+            args = new String[]{userInput.substring(commandName.length()).trim()};
+        }
+
+        if (nonSystemShellCommands.getCommands().contains(commandName))
+            return new NonSystemShellCommandFactory().create(commandName, args);
+        else
+            return CommandFactory.create(commandName).setArg(args);
     }
 
-//    private boolean runsOutsideSystemShell(Command command) {
-//        return runsOutsideSystemShell.contains(command.getName().toLowerCase());
-//    }
+    private class NonSystemShellCommandFactory {
+        private NonSystemShellCommandFactory() {
+            // prevents instantiation
+        }
 
-    private String retrieveResults(Process process) {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            return "failed to execute";
+        public Command create(String name, Object arg) throws IllegalArgumentException, NoSuchCommandException {
+            if (name.equalsIgnoreCase(CommandNames.EXIT)) {
+                return new ExitSessionCommand().setArg(context);
+            }
+
+            if (name.equalsIgnoreCase(CommandNames.SHELL))
+                return new NewWindowCommand().setArg(arg);
+
+            throw new NoSuchCommandException(String.format("O comando '%s' não é reconhecido como um comando interno ou externo", name));
         }
     }
 }

@@ -1,8 +1,6 @@
 package tsi.too.lucaschfonseca.shell.ui;
 
 import tsi.too.lucaschfonseca.shell.CommandInterpreter;
-import tsi.too.lucaschfonseca.shell.model.Command;
-import tsi.too.lucaschfonseca.shell.model.CommandFactory;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -13,19 +11,20 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame {
+public class Shell extends JFrame {
 
     private static int shellNumber = 0;
 
     private JTextArea outputTextArea;
     private JTextArea inputTextArea;
 
-    private final CommandInterpreter interpreter = CommandInterpreter.getInstance();
+    private final CommandInterpreter interpreter;
 
-    public MainWindow(String c) {
+    public Shell(String c) {
+        interpreter = new CommandInterpreter(this);
+
         initComponent();
         setUpWindow();
-
         if (c == null || c.isBlank()) {
             setTitle("Shell " + ++shellNumber);
             var s = getDefaultDirectory() + ">";
@@ -151,43 +150,28 @@ public class MainWindow extends JFrame {
         var split = enteredCommand.split(">");
         inputTextArea.setText(split[0] + ">");
 
-        if (split[1].trim().isBlank())
-            return;
-
         try {
-            var command = recoverCommandFromUserInput(split[1].replaceAll("\n", ""));
+            appendCommandOnHistory(interpreter.interpretAndExecute(split[1].replaceAll("\n", "")));
         } catch (IllegalArgumentException e) {
             appendCommandOnHistory(e.getMessage());
         }
     }
 
     private void appendCommandOnHistory(String message) {
+        if(message.isEmpty())
+            return;
+
         if (outputTextArea.getText().isEmpty())
             outputTextArea.append(message.replace("\n", ""));
         else
             outputTextArea.append("\n" + message.replace("\n", ""));
     }
 
-    private Command recoverCommandFromUserInput(String userInput) throws IllegalArgumentException {
-        String commandName;
-        String args = "";
-
-        if (userInput == null || !userInput.contains(" ")) {
-            commandName = userInput;
-        } else {
-            commandName = userInput.substring(0, userInput.indexOf(" ")).trim();
-            args = userInput.substring(commandName.length()).trim();
-        }
-
-        System.out.println(args);
-        return CommandFactory.create(commandName.replace("\n", "").trim());
-    }
-
     public static void open(String directory) {
-        new MainWindow(directory).setVisible(true);
+        new Shell(directory).setVisible(true);
     }
 
-    private void close() {
+    public void close() {
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 }

@@ -7,10 +7,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ExternalCommandsTable implements CommandsTable {
+public class NonSystemShellCommandsTable implements CommandsTable {
 
     @Override
     public Set<String> getCommands() {
-        return new HashSet<>(Arrays.asList(CommandNames.TREE, CommandNames.ATTRIB, CommandNames.HELP));
+        return new HashSet<>(Arrays.asList(CommandNames.EXIT, CommandNames.SHELL));
     }
 }
